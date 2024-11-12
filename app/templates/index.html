@@ -24,7 +24,7 @@
                 <strong>{{ task.name }}</strong><br>
                 Starting Date: {{ task.starting_date }}<br>
                 Ending Date: {{ task.ending_date }}<br>
-                Status: {{ 'Completed' if task.is_complete else 'Not Completed' }}<br>
+                Status: {{ 'Completed' if task.is_complete else 'In progress' }}<br>
                 Description: {{ task.description }}
             </li>
         {% endfor %}
