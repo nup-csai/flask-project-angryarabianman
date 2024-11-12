@@ -10,3 +10,25 @@
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Task Tracker</title>
+</head>
+<body>
+    <h1>Tasks List</h1>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <strong>{{ task.name }}</strong><br>
+                Starting Date: {{ task.starting_date }}<br>
+                Ending Date: {{ task.ending_date }}<br>
+                Status: {{ 'Completed' if task.is_complete else 'Not Completed' }}<br>
+                Description: {{ task.description }}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="/tasks_json">View Tasks in JSON format</a>
+</body>
+</html>
