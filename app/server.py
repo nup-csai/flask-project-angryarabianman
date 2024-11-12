@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify
 
-# Данные задач
 Tasks = [{
     "name": "Task 1",
     "starting_date": "12.11.2024",
