@@ -3,7 +3,7 @@ import requests
 def check_root_url(url):
     try:
         response = requests.get(url)
-        if response.status_code == 400:
+        if response.status_code == 200:
             print("Запрос успешен, код 200.")
         else:
             exit(-1)
