@@ -5,6 +5,7 @@
 </head>
 <body>
     <h1>Tasks List</h1>
+    <a href="/add_task">Add task</a>
     <ul>
         {% for task in tasks %}
             <li>
@@ -13,9 +14,13 @@
                 Ending Date: {{ task.ending_date }}<br>
                 Status: {{ 'Completed' if task.is_complete else 'In progress' }}<br>
                 Description: {{ task.description }}
+                <form method="POST" action="/">
+                    <input type="submit" value="Edit">
+                </form>
             </li>
         {% endfor %}
     </ul>
     <a href="/tasks_json">View Tasks in JSON format</a>
+
 </body>
 </html>

@@ -2,9 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Edit</title>
 </head>
 <body>
+    <a href="/">Home</a> <br/> <br/>
+    <form method="POST" action="/edit_task">
+        <label for="task_name">Task name:</label><br>
+        <input type="text" id="task_name" name="task_name" required><br><br>
 
+        <label for="starting_date">Starting date:</label><br>
+        <input type="date" id="starting_date" name="starting_date" required><br><br>
+
+        <label for="ending_date">Ending date:</label><br>
+        <input type="date" id="ending_date" name="ending_date" required><br><br>
+
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+
+        <input type="submit" value="Add">
+    </form>
 </body>
 </html>
