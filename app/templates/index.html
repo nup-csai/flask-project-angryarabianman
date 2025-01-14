@@ -4,23 +4,25 @@
     <title>Task Tracker</title>
 </head>
 <body>
-    <h1>Tasks List</h1>
+    <h1>User: {{ email }}</h1>
+    <a href="/signup">Sign up</a>
+    <br>
+    <a href="/login">Login</a>
+    <br>
+    <a href="/logout">Logout</a>
+    <br>
     <a href="/add_task">Add task</a>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <strong>{{ task.name }}</strong><br>
-                Starting Date: {{ task.starting_date }}<br>
-                Ending Date: {{ task.ending_date }}<br>
-                Status: {{ 'Completed' if task.is_complete else 'In progress' }}<br>
-                Description: {{ task.description }}
-                <form method="POST" action="/">
-                    <input type="submit" value="Edit">
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="/tasks_json">View Tasks in JSON format</a>
-
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% for task in tasks %}
+        <h2>Name: {{ task.name }}</h2>
+        <p>Description: {{ task.description }}</p>
+    {% endfor %}
 </body>
 </html>

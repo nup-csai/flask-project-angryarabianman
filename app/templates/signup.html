@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form action="#" method="POST">
+        <input type="email" name="email" placeholder="Enter email" value="{{ email if email }}">
+        <input type="password" name="password" placeholder="Enter password" value="{{ password if password }}">
+        <input type="submit" value="submit">
+    </form>
+
+</body>
+</html>
