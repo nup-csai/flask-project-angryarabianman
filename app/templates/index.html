@@ -5,24 +5,47 @@
 </head>
 <body>
     <h1>User: {{ email }}</h1>
-    <a href="/signup">Sign up</a>
-    <br>
-    <a href="/login">Login</a>
-    <br>
-    <a href="/logout">Logout</a>
-    <br>
-    <a href="/add_task">Add task</a>
-    <br>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+    <a href="/logout">Logout</a><br><br>
+
+    <form action="#" method="POST">
+        <label for="input_task_name">Task name:</label><br>
+        <input type="text" name="input_task_name"
+           value="{% if edit_mode %}{{ request.form.get('input_task_name')}}{% else %}{{""}}{% endif %}"
+           {% if edit_mode %}readonly{% else %}required{% endif %}><br>
+
+    <label for="input_starting_date">Starting date:</label><br>
+    <input type="date" name="input_starting_date"
+           value="{% if edit_mode %}{{ request.form.get('input_starting_date') }}{% else %}{{""}}{% endif %}"
+           {% if edit_mode %}readonly{% else %}required{% endif %}><br>
+
+    <label for="input_ending_date">Ending date:</label><br>
+    <input type="date" name="input_ending_date"
+           value="{% if edit_mode %}{{ request.form.get('input_ending_date') }}{% else %}{{""}}{% endif %}"
+           {% if edit_mode %}readonly{% else %}required{% endif %}><br>
+
+    <label for="description">Description:</label><br>
+    <textarea name="input_description" {% if edit_mode %}readonly{% endif %}>{% if edit_mode %}{{ request.form.get('input_description') }}{% else %}{{""}}{% endif %}</textarea><br><br>
+
+        {% if not edit_mode %}
+        <input type="submit" name="add_task" value="Add task">
         {% endif %}
-    {% endwith %}
+        <input type="submit" name="edit_mode" value={% if not edit_mode %}"Edit mode"{% else %}"Stop editing"{% endif %}>
+
+    </form>
+
     {% for task in tasks %}
-        <h2>Name: {{ task.name }}</h2>
+        <h2>{{ task.name }}</h2>
         <p>Description: {{ task.description }}</p>
+        <p>Starting date: {{ task.starting_date.strftime('%Y-%m-%d') if task.starting_date else 'N/A' }}</p>
+        <p>Ending date: {{ task.ending_date.strftime('%Y-%m-%d') if task.ending_date else 'N/A' }}</p>
+
+        <p>Status: {% if task.is_complete %} Completed {% else %} In progress {% endif %}</p>
+        <form action="#" method="POST">
+            <input type="hidden" name="task_id" value="{{ task._id }}">
+            <input type="submit" name="action" value="Delete task" {% if edit_mode %}hidden{% endif %}>
+            <input type="submit" name="action" value="Edit task" {% if not edit_mode %}hidden{% endif %}>
+        </form>
     {% endfor %}
+
 </body>
 </html>
