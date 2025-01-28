@@ -1,5 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from datetime import timedelta, datetime
+import smtplib, string, random
+import os.path
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -7,6 +9,9 @@ app.secret_key = "hello"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.app_context().push()
+
+SENDER_EMAIL = "ilya.task.manager@gmail.com"
+SENDER_PASSWORD = "mzwrvbnotfbqcklo"
 
 db = SQLAlchemy(app)
 
@@ -37,6 +42,14 @@ class tasks(db.Model):
         self.is_task_complete = is_task_complete
 
 db.create_all()
+
+def get_task_info():
+    name = request.form.get("input_task_name")
+    description = request.form.get("input_description")
+    starting_date = datetime.strptime(request.form.get("input_starting_date"), '%Y-%m-%d')
+    ending_date = datetime.strptime(request.form.get("input_ending_date"), '%Y-%m-%d')
+    task = tasks(session["email"], name, description, starting_date, ending_date, False)
+    return task
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -50,11 +63,7 @@ def home():
                 return redirect(url_for('home'))
 
         if request.form.get("add_task"):
-            name = request.form.get("input_task_name")
-            description = request.form.get("input_description")
-            starting_date = datetime.strptime(request.form.get("input_starting_date"), '%Y-%m-%d')
-            ending_date = datetime.strptime(request.form.get("input_ending_date"), '%Y-%m-%d')
-            task = tasks(session["email"], name, description, starting_date, ending_date, False)
+            task = get_task_info()
             db.session.add(task)
             db.session.commit()
             return redirect(url_for('home'))
@@ -80,18 +89,15 @@ def home():
             task.starting_date = session['starting_date']
             task.ending_date = session['ending_date']
             db.session.commit()
+            home.edit_mode = not home.edit_mode
             return redirect(url_for('home'))
 
-
-    email = "none"
-    tasks_list = []
     if "logged_in" in session:
         email = session['email']
         tasks_list = tasks.query.filter_by(user_email=email).all()
         return render_template('index.html', email=email, tasks=tasks_list, edit_mode=home.edit_mode)
     else:
         return render_template('welcome.html')
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -104,13 +110,44 @@ def signup():
             flash('Email already registered', 'error')
             return redirect(url_for('signup'))
         else:
-            user = users(email, password)
-            db.session.add(user)
-            db.session.commit()
-
-        return redirect(url_for('login'))
+            session['email'] = email
+            session['password'] = password
+            session['code_sent'] = False
+            return redirect(url_for('verify'))
 
     return render_template('signup.html')
+
+@app.route('/signup/verify', methods=['GET', 'POST'])
+def verify():
+    if not session['code_sent']:
+        print("123")
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+
+        session['code'] = ''.join([random.choice(string.ascii_uppercase +
+                                               string.ascii_lowercase +
+                                               string.digits)
+                                 for n in range(6)])
+
+        server.sendmail(SENDER_EMAIL, session['email'], session['code'])
+        server.quit()
+        session['code_sent'] = True
+
+    if request.method == 'POST':
+        print(request.form.get('code'))
+        print(session['code'])
+        user = users(session["email"], session["password"])
+        code = session['code']
+        session.clear()
+        if request.form.get('code') == code:
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('login'))
+
+        return redirect(url_for('signup'))
+
+    return render_template('verify.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -120,8 +157,7 @@ def login():
 
         found_user = users.query.filter_by(email=email).first()
 
-        if found_user:
-            if found_user.password == password:
+        if found_user and found_user.password == password:
                 session['logged_in'] = True
                 session['email'] = email
                 return redirect(url_for('home'))
@@ -140,3 +176,4 @@ def logout():
 
 
 home.edit_mode = False
+
