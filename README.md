@@ -6,8 +6,9 @@ Link: https://flask-project-angryarabianman.up.railway.app/
 
 ## Description
 
-Task tracker with calendar integration\
-A task management app that allows users to create, edit, and delete tasks, link them to dates or deadlines, and view them in a calendar. Tasks can belong to different projects and have statuses like "in progress" or "completed." 
+Task tracker
+
+A task management app that allows users to create, edit, and delete tasks, link them to dates or deadlines and recieve notifications via email. Tasks can belong to different projects and have statuses like "in progress" or "completed." 
 
 
 ## Setup
@@ -28,9 +29,8 @@ Describe technologies, libraries, languages you are using (this can be updated i
 Describe the main features the application performs.
 
 * Managing tasks (creating, editing, deleting)
-* User authentication
-* Notifications about deadlines
-* Progress Tracking
+* User authentication via email
+* Notifications about deadlines via email
 
 ## Git
 

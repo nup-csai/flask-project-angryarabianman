@@ -112,15 +112,13 @@ def signup():
         else:
             session['email'] = email
             session['password'] = password
-            session['code_sent'] = False
             return redirect(url_for('verify'))
 
     return render_template('signup.html')
 
 @app.route('/signup/verify', methods=['GET', 'POST'])
 def verify():
-    if not session['code_sent']:
-        print("123")
+    if request.method == "GET":
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
@@ -132,7 +130,6 @@ def verify():
 
         server.sendmail(SENDER_EMAIL, session['email'], session['code'])
         server.quit()
-        session['code_sent'] = True
 
     if request.method == 'POST':
         print(request.form.get('code'))
