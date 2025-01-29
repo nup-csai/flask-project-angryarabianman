@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "http://localhost:5000"
 
 TEST_EMAIL = "testuser@example.com"
 TEST_PASSWORD = "testpassword"
