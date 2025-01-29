@@ -14,7 +14,7 @@ https://youtu.be/aETA7oENrGU - feature 3, to show it I changed the deadline noti
 
 Task tracker
 
-A task management app that allows users to create, edit, and delete tasks, link them to dates or deadlines and recieve notifications via email. Tasks can belong to different projects and have statuses like "in progress" or "completed." 
+A task management app that allows users to create, edit, and delete tasks, link them to dates or deadlines and recieve notifications via email. Tasks can have statuses like "in progress" or "completed." and completed tasks can be hidden.
 
 
 ## Setup
