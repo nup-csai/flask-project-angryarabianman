@@ -217,7 +217,7 @@ scheduler.add_job(
     id='send_reminder_job',
     func=send_task_reminders,
     trigger='interval',
-    seconds=30,
+    hours=24,
 )
 
 scheduler.start()
