@@ -4,6 +4,12 @@
 Link: https://flask-project-angryarabianman.up.railway.app/
 
 
+Screencasts:
+
+https://youtu.be/qIVbqrygN4g - features 1 and 2
+
+https://youtu.be/aETA7oENrGU - feature 3, to show it I changed the deadline notification interval from 24 hours to 30 seconds (now it is 24 hours)
+
 ## Description
 
 Task tracker
