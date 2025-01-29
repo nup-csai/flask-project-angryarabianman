@@ -103,7 +103,6 @@ def home():
         if task_id and action == "Change status":
             task = tasks.query.filter_by(_id=task_id).first()
             task.is_task_complete = not task.is_task_complete
-            print(task.is_task_complete)
             db.session.commit()
             return redirect(url_for('home'))
 
