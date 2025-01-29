@@ -13,16 +13,21 @@ A task management app that allows users to create, edit, and delete tasks, link 
 
 ## Setup
 
-Describe the steps to set up the environment and run the application. This can be a bash script or docker commands.
+Run using docker
+
 
 ```
-Your commands
-
+docker build -t app .
+docker run -p 8080:8080 app
 ```
 
 ## Requirements
 
-Describe technologies, libraries, languages you are using (this can be updated in the future).
+Flask
+requests
+flask_sqlalchemy
+Flask-Mail
+Flask-APScheduler
 
 ## Features
 
@@ -34,13 +39,9 @@ Describe the main features the application performs.
 
 ## Git
 
-Specify which branch will store the latest stable version of the application
+master
 
 ## Success Criteria
 
-
-Describe the criteria by which the success of the project can be determined
-(this will be updated in the future)
-
-* Criteria 1
+All features are working
 
