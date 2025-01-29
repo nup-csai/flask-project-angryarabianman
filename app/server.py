@@ -1,11 +1,13 @@
-from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
-from flask_apscheduler import APScheduler
-from flask_mail import Mail, Message
 import logging
-import smtplib, string, random
-from datetime import timedelta, datetime
 import os.path
+import random
+import string
+from datetime import timedelta, datetime
+
+from flask import Flask, redirect, url_for, render_template, request, session, flash
+from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
@@ -21,9 +23,6 @@ app.config['MAIL_USERNAME'] = 'ilya.task.manager@gmail.com'
 app.config['MAIL_PASSWORD'] = 'mzwrvbnotfbqcklo'
 app.config['MAIL_DEFAULT_SENDER'] = 'ilya.task.manager@gmail.com'
 
-app.config['SCHEDULER_API_ENABLED'] = True
-
-
 app.app_context().push()
 
 SENDER_EMAIL = "ilya.task.manager@gmail.com"
@@ -31,8 +30,7 @@ SENDER_PASSWORD = "mzwrvbnotfbqcklo"
 
 db = SQLAlchemy(app)
 mail = Mail(app)
-scheduler = APScheduler()
-scheduler.init_app(app)
+scheduler = BackgroundScheduler()
 
 class users(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
@@ -197,30 +195,33 @@ home.edit_mode = False
 home.show_completed = True
 
 def send_task_reminders():
-    tomorrow = datetime.utcnow().date() + timedelta(days=1)
-    tasks_list = tasks.query.filter(tasks.ending_date <= tomorrow).all()
-    logging.debug(tasks_list)
-    logging.debug(tomorrow)
-    for task in tasks_list:
-        if task.is_task_complete or task.notification_sent:
-            continue
+    with app.app_context():
+        tomorrow = datetime.utcnow().date() + timedelta(days=2)
+        tasks_list = tasks.query.filter(tasks.ending_date <= tomorrow).all()
+        logging.debug(tasks_list)
+        logging.debug(tomorrow)
+        for task in tasks_list:
+            if task.is_task_complete or task.notification_sent:
+                continue
 
-        msg = Message(
-            subject="Task Reminder",
-            recipients=[task.user_email],
-            body=f"Reminder: the deadline for the task '{task.name}' is coming!"
-        )
-        mail.send(msg)
-        task.notification_sent = True
-        db.session.commit()
+            msg = Message(
+                subject="Task Reminder",
+                recipients=[task.user_email],
+                body=f"Reminder: the deadline for the task '{task.name}' is coming!"
+            )
+            mail.send(msg)
+            task.notification_sent = True
+            db.session.commit()
 
 scheduler.add_job(
     id='send_reminder_job',
     func=send_task_reminders,
     trigger='interval',
-    minutes=5,
+    seconds=30,
 )
+
+scheduler.start()
+
 if __name__ == "__main__":
-    scheduler.start()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
