@@ -13,11 +13,6 @@
            value="{% if edit_mode %}{{ request.form.get('input_task_name')}}{% else %}{{""}}{% endif %}"
            {% if edit_mode %}readonly{% else %}required{% endif %}><br>
 
-    <label for="input_starting_date">Starting date:</label><br>
-    <input type="date" name="input_starting_date"
-           value="{% if edit_mode %}{{ request.form.get('input_starting_date') }}{% else %}{{""}}{% endif %}"
-           {% if edit_mode %}readonly{% else %}required{% endif %}><br>
-
     <label for="input_ending_date">Ending date:</label><br>
     <input type="date" name="input_ending_date"
            value="{% if edit_mode %}{{ request.form.get('input_ending_date') }}{% else %}{{""}}{% endif %}"
@@ -36,7 +31,6 @@
     {% for task in tasks %}
         <h2>{{ task.name }}</h2>
         <p>Description: {{ task.description }}</p>
-        <p>Starting date: {{ task.starting_date.strftime('%Y-%m-%d') if task.starting_date else 'N/A' }}</p>
         <p>Ending date: {{ task.ending_date.strftime('%Y-%m-%d') if task.ending_date else 'N/A' }}</p>
 
         <p>Status: {% if task.is_complete %} Completed {% else %} In progress {% endif %}</p>

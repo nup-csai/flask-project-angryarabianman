@@ -1,19 +1,31 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from datetime import timedelta, datetime
+from flask_mail import Mail, Message
 import smtplib, string, random
 import os.path
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
 app.secret_key = "hello"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'ilya.task.manager@gmail.com'
+app.config['MAIL_PASSWORD'] = 'mzwrvbnotfbqcklo'
+app.config['MAIL_DEFAULT_SENDER'] = 'ilya.task.manager@gmail.com'
+
 app.app_context().push()
 
 SENDER_EMAIL = "ilya.task.manager@gmail.com"
 SENDER_PASSWORD = "mzwrvbnotfbqcklo"
 
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 class users(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
@@ -29,15 +41,13 @@ class tasks(db.Model):
     user_email = db.Column("user_email", db.String)
     name = db.Column("name", db.String)
     description = db.Column("description", db.String)
-    starting_date = db.Column("starting_date", db.DateTime)
     ending_date = db.Column("ending_date", db.DateTime)
     is_task_complete = db.Column("task_status", db.Boolean)
 
-    def __init__(self, user_email, name, description, starting_date, ending_date, is_task_complete):
+    def __init__(self, user_email, name, description, ending_date, is_task_complete):
         self.user_email = user_email
         self.name = name
         self.description = description
-        self.starting_date = starting_date
         self.ending_date = ending_date
         self.is_task_complete = is_task_complete
 
@@ -46,9 +56,8 @@ db.create_all()
 def get_task_info():
     name = request.form.get("input_task_name")
     description = request.form.get("input_description")
-    starting_date = datetime.strptime(request.form.get("input_starting_date"), '%Y-%m-%d')
     ending_date = datetime.strptime(request.form.get("input_ending_date"), '%Y-%m-%d')
-    task = tasks(session["email"], name, description, starting_date, ending_date, False)
+    task = tasks(session["email"], name, description, ending_date, False)
     return task
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -73,12 +82,10 @@ def home():
             if home.edit_mode:
                 session['name'] = request.form.get("input_task_name")
                 session['description'] = request.form.get("input_description")
-                session['starting_date'] = datetime.strptime(request.form.get("input_starting_date"), '%Y-%m-%d')
                 session['ending_date'] = datetime.strptime(request.form.get("input_ending_date"), '%Y-%m-%d')
             else:
                 session.pop('name')
                 session.pop('description')
-                session.pop('starting_date')
                 session.pop('ending_date')
             return redirect(url_for('home'))
 
@@ -86,7 +93,6 @@ def home():
             task = tasks.query.filter_by(_id=task_id).first()
             task.name = session['name']
             task.description = session['description']
-            task.starting_date = session['starting_date']
             task.ending_date = session['ending_date']
             db.session.commit()
             home.edit_mode = not home.edit_mode
@@ -119,21 +125,18 @@ def signup():
 @app.route('/signup/verify', methods=['GET', 'POST'])
 def verify():
     if request.method == "GET":
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-
         session['code'] = ''.join([random.choice(string.ascii_uppercase +
                                                string.ascii_lowercase +
                                                string.digits)
                                  for n in range(6)])
-
-        server.sendmail(SENDER_EMAIL, session['email'], session['code'])
-        server.quit()
+        msg = Message(
+            subject="Task manager authentication code",
+            recipients=[session['email']],
+            body=session['code']
+        )
+        mail.send(msg)
 
     if request.method == 'POST':
-        print(request.form.get('code'))
-        print(session['code'])
         user = users(session["email"], session["password"])
         code = session['code']
         session.clear()
