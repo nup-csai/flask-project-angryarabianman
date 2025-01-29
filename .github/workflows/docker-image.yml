@@ -24,7 +24,7 @@ jobs:
     # Check if Flask app is up and running
     - name: Wait for Flask to be ready
       run: |
-        until curl -s http://localhost:8080 > /dev/null; do
+        until curl -s http://localhost:5000 > /dev/null; do
           echo "Waiting for Flask to start..."
           sleep 5
         done
