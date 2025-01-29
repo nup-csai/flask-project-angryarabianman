@@ -28,13 +28,13 @@ docker run -p 8080:8080 app
 ```
 
 ## Requirements
-
+```
 Flask
 requests
 flask_sqlalchemy
 Flask-Mail
 Flask-APScheduler
-
+```
 ## Features
 
 Describe the main features the application performs.
