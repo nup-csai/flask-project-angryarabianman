@@ -2,3 +2,4 @@ Flask
 requests
 pytest
 flask_sqlalchemy
+Flask-Mail
