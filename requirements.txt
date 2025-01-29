@@ -3,3 +3,4 @@ requests
 pytest
 flask_sqlalchemy
 Flask-Mail
+Flask-APScheduler

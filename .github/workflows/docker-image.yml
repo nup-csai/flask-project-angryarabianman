@@ -19,7 +19,7 @@ jobs:
       run: docker build . --file Dockerfile -t app
 
     - name: Run Docker container
-      run: docker run -d -p 5000:5000 --name app_container -t app
+      run: docker run -d -p 8080:8080 --name app_container -t app
 
     - name: Run client script
       run: docker exec app_container python app/client.py
