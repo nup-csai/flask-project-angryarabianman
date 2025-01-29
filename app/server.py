@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from datetime import timedelta, datetime
 from flask_mail import Mail, Message
+import logging
 import smtplib, string, random
 import os.path
 from flask_sqlalchemy import SQLAlchemy
@@ -43,13 +44,14 @@ class tasks(db.Model):
     description = db.Column("description", db.String)
     ending_date = db.Column("ending_date", db.DateTime)
     is_task_complete = db.Column("task_status", db.Boolean)
-
-    def __init__(self, user_email, name, description, ending_date, is_task_complete):
+    notification_sent = db.Column("notification_sent", db.Boolean)
+    def __init__(self, user_email, name, description, ending_date, is_task_complete, notification_sent = False):
         self.user_email = user_email
         self.name = name
         self.description = description
         self.ending_date = ending_date
         self.is_task_complete = is_task_complete
+        self.notification_sent = notification_sent
 
 db.create_all()
 
@@ -98,10 +100,21 @@ def home():
             home.edit_mode = not home.edit_mode
             return redirect(url_for('home'))
 
+        if task_id and action == "Change status":
+            task = tasks.query.filter_by(_id=task_id).first()
+            task.is_task_complete = not task.is_task_complete
+            print(task.is_task_complete)
+            db.session.commit()
+            return redirect(url_for('home'))
+
+        if request.form.get("show_completed"):
+            home.show_completed = not home.show_completed
+            return redirect(url_for('home'))
+
     if "logged_in" in session:
         email = session['email']
         tasks_list = tasks.query.filter_by(user_email=email).all()
-        return render_template('index.html', email=email, tasks=tasks_list, edit_mode=home.edit_mode)
+        return render_template('index.html', email=email, tasks=tasks_list, edit_mode=home.edit_mode, show_completed=home.show_completed)
     else:
         return render_template('welcome.html')
 @app.route('/signup', methods=['GET', 'POST'])
@@ -176,4 +189,5 @@ def logout():
 
 
 home.edit_mode = False
+home.show_completed = True
 

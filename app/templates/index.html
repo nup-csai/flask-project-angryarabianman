@@ -27,18 +27,23 @@
         <input type="submit" name="edit_mode" value={% if not edit_mode %}"Edit mode"{% else %}"Stop editing"{% endif %}>
 
     </form>
-
+    <form action="#" method="POST">
+        <input type="submit" name="show_completed" value="{% if show_completed %}Hide completed tasks{% else %}Show completed tasks{% endif %}">
+    </form>
     {% for task in tasks %}
-        <h2>{{ task.name }}</h2>
-        <p>Description: {{ task.description }}</p>
-        <p>Ending date: {{ task.ending_date.strftime('%Y-%m-%d') if task.ending_date else 'N/A' }}</p>
+        {% if show_completed or not task.is_task_complete %}
+            <h2>{{ task.name }}</h2>
+            <p>Description: {{ task.description }}</p>
+            <p>Ending date: {{ task.ending_date.strftime('%Y-%m-%d') if task.ending_date else 'N/A' }}</p>
 
-        <p>Status: {% if task.is_complete %} Completed {% else %} In progress {% endif %}</p>
-        <form action="#" method="POST">
-            <input type="hidden" name="task_id" value="{{ task._id }}">
-            <input type="submit" name="action" value="Delete task" {% if edit_mode %}hidden{% endif %}>
-            <input type="submit" name="action" value="Edit task" {% if not edit_mode %}hidden{% endif %}>
-        </form>
+            <p>Status: {% if task.is_task_complete %} Completed {% else %} In progress {% endif %}</p>
+            <form action="#" method="POST">
+                <input type="hidden" name="task_id" value="{{ task._id }}">
+                <input type="submit" name="action" value="Delete task" {% if edit_mode %}hidden{% endif %}>
+                <input type="submit" name="action" value="Change status" {% if edit_mode %}hidden{% endif %}>
+                <input type="submit" name="action" value="Edit task" {% if not edit_mode %}hidden{% endif %}>
+            </form>
+        {% endif %}
     {% endfor %}
 
 </body>
